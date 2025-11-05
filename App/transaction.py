@@ -16,10 +16,10 @@ class Transaction:
 
     # TODO: Write getters and setters for all attributes (4 getters and 4 setters)
 
-    def get_Amount(self):
+    def get_amount(self):
         return self.__amount
 
-    def get_category_name(self):
+    def get_category(self):
         return self.__category_name
 
     def get_description(self):

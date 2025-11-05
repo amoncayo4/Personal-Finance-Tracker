@@ -36,7 +36,7 @@ class Category:
     def get_spent_amount(self, all_transactions):
         total_spent = 0
         for transaction in all_transactions:
-            if transaction.get_category_name() == self.__name:
-                total_spent = total_spent + transaction.get_amount()
+            if transaction.get_category() == self.__name:
+                total_spent = total_spent + transaction.get_Amount()
 
         return total_spent
