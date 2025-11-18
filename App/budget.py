@@ -20,6 +20,7 @@
 18. get_summary_by_category
 19. get_category_summary
 """
+from operator import index
 
 # TODO: import the other classes
 
@@ -241,11 +242,28 @@ class Budget:
     """
     This will be a helper function for deleting and editing a debt
     """
+
+    def update_transaction_by_index(self, index, new_amount, new_category_name, new_description, new_date):
+        transaction = self.__transactions[index]
+        transaction.set_amount(new_amount)
+        transaction.set_category(new_category_name)
+        transaction.set_description(new_description)
+        transaction.set_date(new_date)
+
+
     # TODO: Create a get_debt_by_index method that will take in an index number and return the debt
     #       object stored at that position in the list of debts.
 
     def get_debt_by_index(self, index):
         return self.__debts[index]
+
+def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_paid):
+    debt = self.__debts[index]
+    debt.set_name(new_name)
+    debt.set_total_amount(new_total_amount)
+    debt.set_amount_paid(new_amount_paid)
+
+
 
     """
     User Story 17. Delete a Debt: As a user, I need to delete a debt so that I can remove a fully paid or incorrect one.
