@@ -1,21 +1,73 @@
 from flask import Flask, render_template, request, redirect, url_for
-from App.budget import Budget
-from App.category import Category
-from App.transaction import Transaction
-from App.sinking_fund import Sinking_Fund
-from App.debt import Debt
+from budget import Budget
+import os
+from datetime import datetime, timedelta
 
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "super_secret_key"
+ACTIVE_FILE = None
+budget = None
 
-# In-memory budget (no file I/O)
-budget = Budget()
+# === Directory setup ===
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+
+
+# === 1. Budget path helper ===
+def get_budget_filename(year, month):
+    return os.path.join(DATA_DIR, f"budget_{year}_{month:02}.json")
+
+
+# === 2. Autoload and rollover ===
+def autoload_budget():
+    """
+    Load current month if present.
+    If missing, roll over last month into a new file; THEN reload from disk.
+    If nothing exists, create fresh current month; THEN reload from disk.
+    """
+    global budget, ACTIVE_FILE
+
+    now = datetime.now()
+    current_name = get_budget_filename(now.year, now.month)
+
+    # Case 1: current month exists
+    if os.path.exists(current_name):
+        budget = Budget.load_from_file(current_name)
+        ACTIVE_FILE = current_name
+        return
+
+    # Case 2: try last month
+    first_of_month = now.replace(day=1)
+    last_month_end = first_of_month - timedelta(days=1)
+    prev_name = get_budget_filename(last_month_end.year, last_month_end.month)
+
+    if os.path.exists(prev_name):
+        prev = Budget.load_from_file(prev_name)
+        rolled = Budget.rollover(prev)
+        rolled.save_to_file(current_name)
+        budget = Budget.load_from_file(current_name)
+        ACTIVE_FILE = current_name
+        return
+
+    # Case 3: nothing found — create fresh
+    empty = Budget()
+    empty.save_to_file(current_name)
+    budget = Budget.load_from_file(current_name)
+    ACTIVE_FILE = current_name
 
 # 4
 @app.route("/")
 def home():
+    global budget, ACTIVE_FILE
+    if budget is None or ACTIVE_FILE is None:
+        autoload_budget()
+        if budget is None or ACTIVE_FILE is None:
+            return redirect(url_for("startup"))
+
     total_spent = budget.get_total_spent()
     remaining = budget.get_remaining_budget()
+    summary = budget.get_summary_by_category()
     debts = budget.get_debts()
     funds = budget.get_sinking_funds()
     income = budget.get_monthly_income()
@@ -39,10 +91,13 @@ def home():
         "home.html",
         total_spent=total_spent,
         remaining=remaining,
+        summary=summary,
         debts=debts,
         funds=funds,
         transactions=budget.get_transactions(),
         categories=categories,
+        current_file=ACTIVE_FILE,
+        budget_loaded=True,
         income=income,
         category_names=category_names,
         category_spent=category_spent
@@ -57,7 +112,7 @@ def add_transaction():
         category = request.form["category"]
         description = request.form["description"]
         date = request.form["date"]
-        budget.add_transaction(Transaction(amount, category, description, date))
+        budget.add_transaction(amount, category, description, date)
         return redirect(url_for("home"))
     return render_template("add_transaction.html", categories=budget.get_categories())
 
@@ -273,3 +328,68 @@ def view_funds():
             "percent": f.get_percent_saved()
         })
     return render_template("funds.html", funds=funds)
+
+# 29
+@app.route("/pay_debt/<int:index>", methods=["GET", "POST"])
+def pay_debt(index):
+    debts = budget.get_debts()
+
+    # invalid index -> just go home
+    if index < 0 or index >= len(debts):
+        return redirect(url_for("home"))
+
+    debt = debts[index]
+
+    if request.method == "POST":
+        # get amount
+        try:
+            amount = float(request.form.get("amount", 0))
+        except ValueError:
+            return redirect(request.url)
+
+        # must be positive
+        if amount <= 0:
+            return redirect(request.url)
+
+        remaining = debt.get_total_amount() - debt.get_amount_paid()
+
+        # don't allow overpaying
+        if amount > remaining:
+            return redirect(request.url)
+
+        # apply payment
+        debt.set_amount_paid(debt.get_amount_paid() + amount)
+
+        # just go back home, no flash
+        return redirect(url_for("home"))
+
+    return render_template("pay_debt.html", debt=debt, index=index)
+
+#30
+@app.route("/contribute-fund/<int:index>", methods=["GET", "POST"])
+def contribute_fund(index):
+    funds = budget.get_sinking_funds()
+
+    if index < 0 or index >= len(funds):
+        return redirect(url_for("home"))
+
+    fund = funds[index]
+
+    if request.method == "POST":
+        # parse amount
+        try:
+            amount = float(request.form.get("amount", 0))
+        except ValueError:
+            return redirect(request.url)
+
+        # must be positive
+        if amount <= 0:
+            return redirect(request.url)
+
+        # apply contribution
+        fund.add_contribution(amount)
+
+        # return home
+        return redirect(url_for("home"))
+
+    return render_template("contribute_fund.html", fund=fund, index=index)

@@ -7,7 +7,7 @@
 5. get_remaining_budget(): float
 6. add_category(str, float): void
 7. get_category_by_name(str): Category
-8. add_debt(str, float, float): void
+8. add_debt(str, float, floata): void
 9. get_debt_choices(): list of tuples
 10. add_sinking_fund(str, float, float): void
 11. get_fund_choices(): list of tuples
@@ -19,6 +19,10 @@
 17. delete_sinking_fund_by_index
 18. get_summary_by_category
 19. get_category_summary
+20. to_dict
+21. save_to_file
+22. from_dict
+23. load_from_file
 """
 from operator import index
 
@@ -352,3 +356,34 @@ def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_pai
                 "transactions": transactions_in_this_category
             }
             return summary
+
+    """
+    The following four methods implement memory persistence—the idea of data persisting across runs. With these functions the same
+    data will be loaded every time the application runs automatically, so you won't have to manually input the data every time 
+    you want to test a function of the application. I felt so mean having you implement this so late.
+    """
+    # TODO: Write a method that will convert a Budget object to a dictionary. It should use the attribute names and values
+    #       as the key-value pairs in the dictionary. Each attribute that is composed of other classes should also be converted
+    #       to dictionary objects using their respective to_dict methods
+
+    # TODO: Add memory persistence by saving to a file. Open the specified filename from the parameter.
+    #       Use json.dump to write the budget to the file as a dictionary.
+
+    # TODO: Write a method to convert a dictionary object into a budget object. This will be a static method which means it does 
+    #       not need the self attribute. Put @staticmethod above the function definition to show this. This method should take in
+    #       a dictionary as a parameter and populate a Budget object with the data from the dictionary. The dictionary keys 
+    #       should be the same as the attributes for Budget. This should load the values for each attribute in a budget from the 
+    #       corresponding key in the dictionary. The attributes that should be composed of other objects should call that object's
+    #       respective from_dict method.
+    
+    # TODO: Write a load_from_file method that takes a file name passed in the parameters. It should then use json.load to read
+    #       the contents of the file. The data read from the file should then be converted to objects from the dictionary contents.
+    #       This will also be a static function.
+    
+    # TODO: Write a rollever method that is a static method. It will be passed a previous Budget object. It will take the following
+    #       values from the previous budget and set the corresponding attributes on the current budget:
+    #           - monthly_income
+    #           - categories and all their attributes
+    #           - sinking funds keeping their goal amount and progress
+    #           - debts keeping their owed amount and progress
+    #       The function will then return the newly created budget with values rolled over from the prvious month.

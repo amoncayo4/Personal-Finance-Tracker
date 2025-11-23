@@ -4,6 +4,8 @@
 2. add_contribution
 3. get_progress
 4. get_percent_saved
+5. to_dict
+6. from_dict
 getters and setters
 """
 
@@ -62,8 +64,21 @@ class Sinking_Fund:
     User Story 19.	View Percent Paid: As a user, I need to see the percent saved of my sinking fund so that I know how close I am to my goal.
     """
     # TODO: Create a get_percent_saved method to calculate what percent of the goal has been saved
+<<<<<<< HEAD
 
 
     def get_percent_saved(self):
         percent = self.get_progress() * 100
         return percent
+=======
+    
+    """
+    This will be a helper function for memory persistence (file usage to store data)
+    """
+    # TODO: Write a to_dict method that will turn an object into a dictionary using the attribute names and values as key-value pairs.
+
+    """
+    This will be a helper function for memory persistence (file usage to store data)
+    """
+    # TODO: Write a from_dict method that will use a dictionary parameter to create and return a Sinking Fund object.
+>>>>>>> upstream/main

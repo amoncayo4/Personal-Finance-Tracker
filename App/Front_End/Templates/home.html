@@ -154,44 +154,55 @@
       </div>
     </div>
   </div>
-
-  <!-- Sinking Funds -->
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-header bg-info text-white">Sinking Funds</div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-striped align-middle mb-3">
-            <thead>
+<!-- Sinking Funds -->
+<div class="col-md-6">
+  <div class="card shadow-sm">
+    <div class="card-header bg-info text-white">Sinking Funds</div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle mb-3">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Saved</th>
+              <th>Goal</th>
+              <th>Progress %</th>
+              <th>Actions</th>  <!-- NEW -->
+            </tr>
+          </thead>
+          <tbody>
+            {% for fund in funds %}
               <tr>
-                <th>Name</th>
-                <th>Saved</th>
-                <th>Goal</th>
-                <th>Progress %</th>
+                <td>{{ fund.get_name() }}</td>
+                <td>${{ '%.2f' % fund.get_current_amount() }}</td>
+                <td>${{ '%.2f' % fund.get_goal_amount() }}</td>
+                <td>{{ '%.1f' % fund.get_percent_saved() }}%</td>
+
+                <td>
+                  <a href="{{ url_for('contribute_fund', index=loop.index0) }}"
+                     class="btn btn-sm btn-outline-success">
+                    Contribute
+                  </a>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {% for fund in funds %}
-                <tr>
-                  <td>{{ fund.get_name() }}</td>
-                  <td>${{ '%.2f' % fund.get_current_amount() }}</td>
-                  <td>${{ '%.2f' % fund.get_goal_amount() }}</td>
-                  <td>{{ '%.1f' % fund.get_percent_saved() }}%</td>
-                </tr>
-              {% else %}
-                <tr><td colspan="4" class="text-muted">No funds yet.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="btn-group">
-          <a href="{{ url_for('add_fund') }}" class="btn btn-outline-info">Add</a>
-          <a href="{{ url_for('edit_fund_select') }}" class="btn btn-outline-secondary">Edit</a>
-          <a href="{{ url_for('delete_fund') }}" class="btn btn-outline-danger">Delete</a>
-        </div>
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-muted">No funds yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
+
+      <div class="btn-group">
+        <a href="{{ url_for('add_fund') }}" class="btn btn-outline-info">Add</a>
+        <a href="{{ url_for('edit_fund_select') }}" class="btn btn-outline-secondary">Edit</a>
+        <a href="{{ url_for('delete_fund') }}" class="btn btn-outline-danger">Delete</a>
+      </div>
+
     </div>
   </div>
+</div>
 
   <!-- Debts -->
   <div class="col-md-6">
@@ -206,6 +217,7 @@
                 <th>Paid</th>
                 <th>Total</th>
                 <th>Remaining</th>
+                <th>Actions</th>  <!-- NEW -->
               </tr>
             </thead>
             <tbody>
@@ -215,9 +227,16 @@
                   <td>${{ '%.2f' % debt.get_amount_paid() }}</td>
                   <td>${{ '%.2f' % debt.get_total_amount() }}</td>
                   <td>${{ '%.2f' % (debt.get_total_amount() - debt.get_amount_paid()) }}</td>
+
+                  <td>
+                    <a href="{{ url_for('pay_debt', index=loop.index0) }}"
+                      class="btn btn-sm btn-outline-success">
+                      Pay
+                    </a>
+                  </td>
                 </tr>
               {% else %}
-                <tr><td colspan="4" class="text-muted">No debts yet.</td></tr>
+                <tr><td colspan="5" class="text-muted">No debts yet.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -230,6 +249,7 @@
       </div>
     </div>
   </div>
+
 
 </div>
 

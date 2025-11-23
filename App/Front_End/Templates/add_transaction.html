@@ -2,6 +2,11 @@
 {% block title %}Add Transaction{% endblock %}
 {% block content %}
 <h1>Add a Transaction</h1>
+
+{% if categories|length == 0 %}
+  <p class="text-danger">Create a category before adding a transaction.</p>
+{% endif %}
+
 <form method="POST">
   <div class="mb-3">
     <label for="amount" class="form-label">Amount:</label>
@@ -23,7 +28,12 @@
     <label for="date" class="form-label">Date:</label>
     <input type="date" id="date" name="date" class="form-control" required>
   </div>
-  <button type="submit" class="btn btn-primary">Add</button>
+
+  <button type="submit" class="btn btn-primary"
+          {% if categories|length == 0 %}disabled{% endif %}>
+    Add
+  </button>
+
   <a href="{{ url_for('home') }}" class="btn btn-secondary ms-2">Back</a>
 </form>
 {% endblock %}
