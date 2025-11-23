@@ -53,20 +53,30 @@ class Debt:
     User Story 10. View Remaining Balance: As a user, I need to see the remaining balance for my debt so that I know what’s left to pay.
     """
     # TODO: Create a get_remaining_balance method to calculate how much of the debt is left to be paid
-<<<<<<< HEAD
 
     def get_remaining_balance(self):
         remaining = self.__total_amount - self.__amount_paid
         return remaining
-=======
     
     """
     This will be a helper function for memory persistence (file usage to store data)
     """
     # TODO: Write a to_dict method that will turn an object into a dictionary using the attribute names and values as key-value pairs.
 
+    def to_dict(self):
+        return {
+            "name": self.__name,
+            "total_amount": self.__total_amount,
+            "amount_paid": self.__amount_paid,
+        }
+
     """
     This will be a helper function for memory persistence (file usage to store data)
     """
     # TODO: Write a from_dict method that will use a dictionary parameter to create and return a Debt object.
->>>>>>> upstream/main
+
+    def from_dict(data):
+        debt = Debt(data["name"], data["total_amount"])
+        debt.set_amount_paid(data["amount_paid"])
+
+        return debt

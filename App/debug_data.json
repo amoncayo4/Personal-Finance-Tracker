@@ -1,0 +1,19 @@
+{
+    "monthly_income": 0,
+    "categories": [
+        {
+            "name": "Food",
+            "budget_limit": 100
+        }
+    ],
+    "transactions": [
+        {
+            "amount": 15.5,
+            "category_name": "Food",
+            "description": "Burger",
+            "date": "2025-11-22"
+        }
+    ],
+    "debts": [],
+    "sinking_funds": []
+}

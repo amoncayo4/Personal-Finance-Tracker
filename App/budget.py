@@ -24,10 +24,9 @@
 22. from_dict
 23. load_from_file
 """
-from operator import index
 
 # TODO: import the other classes
-
+import json
 from transaction import Transaction
 from category import Category
 from debt import Debt
@@ -49,10 +48,19 @@ class Budget:
     # TODO: Create an add_transaction method. It will take in the information to make a transaction object then add
     #       it to the list of transactions managed by the budget
 
-    def add_transaction(self, amount, category_name, description, date):
-        new_transaction = Transaction(amount, category_name, description, date)
+    def add_transaction(self, amount, category_index_string, description, date):
+        try:
+            index = int(category_index_string)
+            real_category_object = self.get_category_by_index(index)
+            real_category_name = real_category_object.get_name()
+        except:
+            real_category_name = category_index_string
 
+        new_transaction = Transaction(amount, real_category_name, description, date)
         self.__transactions.append(new_transaction)
+
+    def add_transanction(self, amount, category_name, description, date):
+        self.add_transaction(amount, category_name, description, date)
 
     """
     User Story 13.	View Total Spent: As a user, I need to see my total spent in a month so that I can track my overall spending.
@@ -62,8 +70,7 @@ class Budget:
     def get_total_spent(self):
         total = 0
         for item in self.__transactions:
-            total = total + item.get_amount
-
+            total = total + item.get_amount()
         return total
 
     """
@@ -77,8 +84,7 @@ class Budget:
     #       The amount should print two decimal places.
 
     def get_transaction_choices(self):
-        choices = []
-
+        choices_list = []
         for index, trans in enumerate(self.__transactions):
             date = trans.get_date()
             desc = trans.get_description()
@@ -87,7 +93,6 @@ class Budget:
             formatted_string = f"{date} - {desc} (${amount:.2f}) in {cat}"
             choice_tuple = (index, formatted_string)
             choices_list.append(choice_tuple)
-
         return choices_list
 
     """"
@@ -97,8 +102,7 @@ class Budget:
 
     def get_remaining_budget(self):
         total_spent = self.get_total_spent()
-
-        remaining = self.__monthly_income = total_spent
+        remaining = self.__monthly_income - total_spent
         return remaining
 
     """
@@ -121,8 +125,7 @@ class Budget:
         for category in self.__categories:
             if category.get_name() == name_to_find:
                 return category
-
-        return none
+        return None
 
     """
     User Story 8. Add a Debt: As a user, I need to add a debt so that I can track what I owe.
@@ -130,8 +133,10 @@ class Budget:
     # TODO: Create an add_debt method that will take in all the data to create a debt object then add it to the list of debts
     #       managed by the budget.
 
-    def add_debt(self, name, total_amount, amount_paid):
+    def add_debt(self, name, total_amount, amount_paid=0):
         new_debt = Debt(name, total_amount)
+        if amount_paid != 0:
+            new_debt.set_amount_paid = (amount_paid)
         self.__debts.append(new_debt)
 
     """
@@ -146,12 +151,10 @@ class Budget:
 
     def get_debt_choices(self):
         choices_list = []
-
         for index, debt in enumerate(self.__debts):
             name = debt.get_name()
             paid = debt.get_amount_paid()
             total = debt.get_total_amount()
-
             formatted_string = f"{name}: Paid ${paid:.2f} / ${total:.2f}"
             choice_tuple = (index, formatted_string)
             choices_list.append(choice_tuple)
@@ -165,6 +168,8 @@ class Budget:
 
     def add_sinking_fund(self, name, goal_amount, current_amount):
         new_fund = Sinking_Fund(name, goal_amount)
+        if current_amount != 0:
+            new_fund.set_current_amount = (current_amount)
         self.__sinking_funds.append(new_fund)
 
     """
@@ -179,7 +184,6 @@ class Budget:
 
     def get_fund_choices(self):
         choices_list = []
-
         for index, fund in enumerate(self.__sinking_funds):
             name = fund.get_name()
             saved = fund.get_current_amount()
@@ -206,14 +210,10 @@ class Budget:
     def get_debts(self):
         return self.__debts
 
-
     def set_monthly_income(self, amount):
         self.__monthly_income = amount
 
-    def set_categories(self, amount):
-        self.__monthly_income = amount
-
-    def set_categories(self, amount):
+    def set_categories(self, categories_list):
         self.__categories = categories_list
 
     def set_transactions(self, transactions_list):
@@ -261,12 +261,11 @@ class Budget:
     def get_debt_by_index(self, index):
         return self.__debts[index]
 
-def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_paid):
-    debt = self.__debts[index]
-    debt.set_name(new_name)
-    debt.set_total_amount(new_total_amount)
-    debt.set_amount_paid(new_amount_paid)
-
+    def update_debt_by_index(self, index, new_name, new_total_amount, new_amount_paid):
+        debt = self.__debts[index]
+        debt.set_name(new_name)
+        debt.set_total_amount(new_total_amount)
+        debt.set_amount_paid(new_amount_paid)
 
 
     """
@@ -310,12 +309,11 @@ def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_pai
 
     def get_summary_by_category(self):
         summary = {}
-
         for category in self.__categories:
             category_name = category.get_name()
             total_spent = category.get_spent_amount(self.__transactions)
             summary[category_name] = total_spent
-
+        return summary
     """
     User Story 5. View Spending by Category: As a user, I need to view spending by category so that I can see where my money goes.
     """
@@ -330,7 +328,6 @@ def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_pai
 
     def get_category_summary(self, category_name):
         category_object = self.get_category_by_name(category_name)
-
         if category_object is None:
             return None
 
@@ -340,7 +337,6 @@ def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_pai
         for trans in self.__transactions:
             if trans.get_category() == category_name:
                 total = total + trans.get_amount()
-
                 trans_details = {
                     "amount": trans.get_amount(),
                     "description": trans.get_description(),
@@ -366,8 +362,21 @@ def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_pai
     #       as the key-value pairs in the dictionary. Each attribute that is composed of other classes should also be converted
     #       to dictionary objects using their respective to_dict methods
 
+    def to_dict(self):
+        return {
+            "monthly_income": self.__monthly_income,
+            "categories": [c.to_dict() for c in self.__categories],
+            "transactions": [t.to_dict() for t in self.__transactions],
+            "debts": [d.to_dict() for d in self.__debts],
+            "sinking_funds": [s.to_dict() for s in self.__sinking_funds],
+        }
+
     # TODO: Add memory persistence by saving to a file. Open the specified filename from the parameter.
     #       Use json.dump to write the budget to the file as a dictionary.
+
+    def save_to_file(self, filename):
+        with open(filename, "w") as f:
+            json.dump(self.to_dict(), f, indent=4)
 
     # TODO: Write a method to convert a dictionary object into a budget object. This will be a static method which means it does 
     #       not need the self attribute. Put @staticmethod above the function definition to show this. This method should take in
@@ -375,11 +384,32 @@ def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_pai
     #       should be the same as the attributes for Budget. This should load the values for each attribute in a budget from the 
     #       corresponding key in the dictionary. The attributes that should be composed of other objects should call that object's
     #       respective from_dict method.
-    
+    @staticmethod
+    def from_dict(data):
+        budget = Budget()
+        budget.set_monthly_income(data.get("monthly_income", 0))
+
+        budget.set_categories([Category.from_dict(c) for c in data.get("categories", [])])
+        budget.set_transactions([Transaction.from_dict(t) for t in data.get("transactions", [])])
+        budget.set_debts([Debt.from_dict(d) for d in data.get("debts", [])])
+        budget.set_sinking_funds([Sinking_Fund.from_dict(s) for s in data.get("sinking_funds", [])])
+
+        return budget
+
     # TODO: Write a load_from_file method that takes a file name passed in the parameters. It should then use json.load to read
     #       the contents of the file. The data read from the file should then be converted to objects from the dictionary contents.
     #       This will also be a static function.
-    
+    @staticmethod
+    def load_from_file(filename):
+        try:
+            with open(filename, "r") as f:
+                data = json.load(f)
+            return Budget.from_dict(data)
+        except Exception as e:
+            print(f"Failed to load {e}")
+            print(f"Trying to load {filename}")
+            return Budget()
+
     # TODO: Write a rollever method that is a static method. It will be passed a previous Budget object. It will take the following
     #       values from the previous budget and set the corresponding attributes on the current budget:
     #           - monthly_income
@@ -387,3 +417,13 @@ def update_debt_by_index(self, index. new_name. new_total_amount, new_amount_pai
     #           - sinking funds keeping their goal amount and progress
     #           - debts keeping their owed amount and progress
     #       The function will then return the newly created budget with values rolled over from the prvious month.
+    @staticmethod
+    def rollover(prev_budget):
+        new_budget = Budget()
+
+        new_budget.set_monthly_income(prev_budget.get_monthly_income())
+        new_budget.set_categories(prev_budget.get_categories())
+        new_budget.set_debts(prev_budget.get_debts())
+        new_budget.set_sinking_funds(prev_budget.get_sining_funds())
+
+        return new_budget

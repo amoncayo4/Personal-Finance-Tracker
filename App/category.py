@@ -27,25 +27,30 @@ class Category:
     def set_budget_limit(self, budget_limit):
         self.__budget_limit = budget_limit
 
-
-
     """
     This is a helper function for finding the category summaries
     """
     # TODO: Create a get_spent_amount method that uses a list of transactions to find the total spent from transactions in a certain category.
-<<<<<<< HEAD
-
 
     def get_spent_amount(self, all_transactions):
         total_spent = 0
         for transaction in all_transactions:
             if transaction.get_category() == self.__name:
-                total_spent = total_spent + transaction.get_Amount()
+                total_spent = total_spent + transaction.get_amount()
 
         return total_spent
-=======
     
     # TODO: Write a to_dict method that will turn an object into a dictionary using the attribute names and values as key-value pairs.
 
+    def to_dict(self):
+        return {
+            "name": self.__name,
+            "budget_limit": self.__budget_limit,
+        }
+
     # TODO: Write a from_dict method that will use a dictionary parameter to create and return a Category object.
->>>>>>> upstream/main
+    def from_dict(data):
+        return Category(
+            data["name"],
+            data["budget_limit"],
+        )
