@@ -1,4 +1,4 @@
-P#ersonal Budgeting System
+#Personal Budgeting System
 
 A backend focused financial management application built with Python. This project was developed through a iteration software development cycle, moving from requirement gathering to a full Object-Oriented implementation.
 
