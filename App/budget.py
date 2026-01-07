@@ -103,6 +103,7 @@ class Budget:
     def get_remaining_budget(self):
         total_spent = self.get_total_spent()
         remaining = self.__monthly_income - total_spent
+
         return remaining
 
     """
