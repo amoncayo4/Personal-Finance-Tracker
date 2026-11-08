@@ -1,35 +1,47 @@
-#Personal Budgeting System
+# Personal Budgeting System
 
-A backend focused financial management application built with Python. This project was developed through a iteration software development cycle, moving from requirement gathering to a full Object-Oriented implementation.
+A Flask web app for tracking personal finances: budgets by category, transactions, debts and savings goals, with data saved to JSON. Built as a team project for CSC 2310 at Tennessee Tech, through an iterative process that went from user stories and UML design to a full object-oriented implementation.
 
-#Project Overview
-This program allows users to record and track personal finances over time. It provides a view of financials by managing daily spending, comparing activity against budget limits, and monitoring debt and savings progress.
+## Features
 
-#Language: Python
-#Framework: Flask (Local Web Hosting)
-#Data Storage:JSON
-#Methodology: Object-Oriented Programming (OOP) and Iterative Design
+- **Budgeting by category:** shows total spent and remaining budget for each category.
+- **Transaction tracking:** log income and expenses with descriptions, dates and categories.
+- **Debt tracking:** record payments against balances and see what's left.
+- **Sinking funds:** track progress toward savings goals.
+- **Monthly rollover:** each month is saved to its own JSON file, and a new month starts from the previous month's budget automatically.
 
-#Features
-Automated Budgeting: Calculates total spent vs. remaining budget by category to prevent overspending.
-Transaction Tracking: Logging of income and expenses with descriptions, dates, and category mapping.
-Debt Management: Tracks total balances and records payments to calculate remaining dues.
-Sinking Funds: Monitors progress toward savings targets.
-Data Persistence: Implemented logic to save and load user profiles automatically.
+## Tech
 
-#Design
-This project prioritizes clean, maintainable code through design artifacts located in the Documentatio folder
-User Stories: Captured user needs following the format: "As a <user>, I want <feature> so that <benefit>".
-UML Class Diagram: Mapped the system architecture, including classes for Budget, Transaction, Category, Debt, and Sinking_Fund.
+- Python, Flask and Jinja templates
+- JSON file storage
+- Object-oriented design with Budget, Transaction, Category, Debt and SinkingFund classes
 
-# Project Structure
-app.py - Flask entry point and front-end integration.
-budget.py - Backend logic and data management.
-Classes - Individual class definitions for financial objects.
-Tests - Unit tests to verify backend calculations.
-Documentation - UML diagrams, user stories, and iteration logs.
+## Project structure
 
-# Setup & Installation
-1. Clone the repository: git clone https://github.com/amoncayo4/Personal-Finance-Tracker.git
-2. Ensure Python and Flask are installed.
-3. Run main.py to host the application locally 
+```
+App/
+  main.py                 Starts the Flask app
+  budget.py               Core budget logic and JSON save/load
+  category.py             Category class
+  transaction.py          Transaction class
+  debt.py                 Debt class
+  sinking_fund.py         Sinking fund class
+  Front_End/app.py        Flask routes
+  Front_End/Templates/    HTML templates
+  Data/                   Monthly budget files (sample data)
+Design/                   UML diagrams and iteration materials
+user_stories.md           User stories
+```
+
+## Run it locally
+
+```
+git clone https://github.com/amoncayo4/Personal-Finance-Tracker.git
+cd Personal-Finance-Tracker/App
+pip install flask
+python main.py
+```
+
+Then open http://127.0.0.1:5000 in your browser.
+
+The app reads its session key from the `FLASK_SECRET_KEY` environment variable and generates a random one if it isn't set.
