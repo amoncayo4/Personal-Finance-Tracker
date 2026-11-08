@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 
 app = Flask(__name__, template_folder="templates")
-app.secret_key = "super_secret_key"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or os.urandom(24)
 ACTIVE_FILE = None
 budget = None
 
